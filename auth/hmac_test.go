@@ -42,7 +42,7 @@ func TestSignAndVerify(t *testing.T) {
     sig := auth.Sign(secret, agentID, ts, body)
 
     req := httptest.NewRequest(
-        "POST", "/", bytes.NewReader(body),
+        http.MethodPost, "/", bytes.NewReader(body),
     )
     req.Header.Set("X-Agent-ID",              agentID)
     req.Header.Set(auth.HeaderTimestamp,       ts)
@@ -65,7 +65,7 @@ func TestVerifyReplayAttack(t *testing.T) {
     body := []byte(`{"jsonrpc":"2.0","method":"tools/call"}`)
     sig  := auth.Sign(secret, agentID, oldTS, body)
 
-    req := httptest.NewRequest("POST", "/",
+    req := httptest.NewRequest(http.MethodPost, "/",
         bytes.NewReader(body))
     req.Header.Set(auth.HeaderTimestamp, oldTS)
     req.Header.Set(auth.HeaderSignature, sig)
@@ -91,7 +91,7 @@ func TestVerifyTamperedBody(t *testing.T) {
     sig := auth.Sign(secret, agentID, ts, origBody)
 
     // Send tampered body with original signature
-    req := httptest.NewRequest("POST", "/",
+    req := httptest.NewRequest(http.MethodPost, "/",
         bytes.NewReader(tamperedBody))
     req.Header.Set(auth.HeaderTimestamp, ts)
     req.Header.Set(auth.HeaderSignature, sig)
@@ -107,7 +107,7 @@ func TestVerifyMissingHeaders(t *testing.T) {
     body := []byte(`{"test":true}`)
 
     // Missing both headers
-    req := httptest.NewRequest("POST", "/",
+    req := httptest.NewRequest(http.MethodPost, "/",
         bytes.NewReader(body))
 
     result := auth.Verify(req, "secret", "agent")

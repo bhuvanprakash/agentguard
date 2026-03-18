@@ -296,4 +296,4 @@ The most valuable contributions right now:
 
 MIT — see [LICENSE](LICENSE).
 
-Built by [Bhuvan Prakash](https://bhuvan.space) in Ludhiana, India.
+Built by [Nascentist](https://nascentist.ai).
