@@ -1,0 +1,43 @@
+[build-system]
+requires      = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name        = "agentguard"
+version     = "0.1.0"
+description = "Protocol-neutral AI agent enforcement proxy SDK"
+readme      = "README.md"
+license     = { text = "MIT" }
+requires-python = ">=3.9"
+
+keywords = [
+    "ai-agents", "mcp", "a2a", "atxp",
+    "agent-safety", "llm", "proxy"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+]
+
+dependencies = []  # Zero required dependencies — stdlib only
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=6.0"]  # only needed for load_policy()
+dev  = ["pytest>=8.0", "pyyaml>=6.0"]
+
+[project.urls]
+Homepage      = "https://nascentist.ai/docs/agentguard"
+Repository    = "https://github.com/nascentist/agentguard"
+Documentation = "https://nascentist.ai/docs/agentguard"
+Issues        = "https://github.com/nascentist/agentguard/issues"
+
+[project.scripts]
+agentguard-validate = "agentguard.policy:_cli_validate"

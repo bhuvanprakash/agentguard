@@ -1,0 +1,56 @@
+# Full AgentGuard stack example.
+# Copy this file, fill in ENV vars, run: docker compose up
+
+version: "3.9"
+
+services:
+
+  # Your existing MCP/agent API (replace with your real service)
+  my-agent-api:
+    image: your-mcp-server:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+
+  # AgentGuard enforcement proxy
+  agentguard:
+    image: nascentist/agentguard:latest
+    ports:
+      - "7777:7777"
+    volumes:
+      - ./policy.yaml:/app/policy.yaml:ro
+    environment:
+      AGENTGUARD_PORT:           7777
+      AGENTGUARD_UPSTREAM_URL:   http://my-agent-api:8080
+      AGENTGUARD_POLICY_FILE:    /app/policy.yaml
+      AGENTGUARD_SQLITE_PATH:    /data/audit.db
+      SUPABASE_URL:              ${SUPABASE_URL}
+      SUPABASE_SERVICE_KEY:      ${SUPABASE_SERVICE_KEY}
+      AGENTGUARD_ADMIN_KEY:      ${AGENTGUARD_ADMIN_KEY}
+      AGENTGUARD_WEBHOOK_URL:    ${AGENTGUARD_WEBHOOK_URL}
+      AGENTGUARD_WEBHOOK_SECRET: ${AGENTGUARD_WEBHOOK_SECRET}
+      AGENTGUARD_BASE_URL:       http://agentguard:7777
+      AGENTGUARD_DASHBOARD_URL:  https://nascentist.ai
+      AGENTGUARD_ENV:            production
+    volumes:
+      - agentguard-data:/data
+    depends_on:
+      - my-agent-api
+    restart: unless-stopped
+    healthcheck:
+      test:     ["CMD", "wget", "-q", "-O-", "http://localhost:7777/health"]
+      interval: 30s
+      timeout:  5s
+      retries:  3
+
+  # Your agent code points at agentguard:7777 instead of my-agent-api:8080
+  my-agent:
+    image: your-agent:latest
+    environment:
+      MCP_SERVER_URL: http://agentguard:7777  # ← only change needed
+    depends_on:
+      - agentguard
+
+volumes:
+  agentguard-data:

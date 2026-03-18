@@ -1,0 +1,58 @@
+# fly.toml — deploy AgentGuard to fly.io
+# Deploy:
+#   fly launch --no-deploy       (first time, sets app name)
+#   fly secrets set \
+#     SUPABASE_URL=xxx \
+#     SUPABASE_SERVICE_KEY=xxx \
+#     AGENTGUARD_UPSTREAM_URL=xxx \
+#     AGENTGUARD_ADMIN_KEY=xxx
+#   fly deploy
+
+app    = "agentguard"
+region = "bom"         # Mumbai — closest to Ludhiana
+primary_region = "bom"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  AGENTGUARD_PORT     = "8080"
+  AGENTGUARD_ENV      = "production"
+  AGENTGUARD_SQLITE_PATH = "/data/audit.db"
+  AGENTGUARD_POLICY_FILE = "/data/policy.yaml"
+
+[[services]]
+  internal_port = 8080
+  protocol      = "tcp"
+
+  [[services.ports]]
+    port     = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port     = 443
+    handlers = ["tls", "http"]
+
+  [[services.http_checks]]
+    interval      = "15s"
+    timeout       = "5s"
+    grace_period  = "10s"
+    method        = "GET"
+    path          = "/health"
+    protocol      = "http"
+    tls_skip_verify = false
+
+  [services.concurrency]
+    type       = "requests"
+    hard_limit = 500
+    soft_limit = 400
+
+[[mounts]]
+  source      = "agentguard_data"
+  destination = "/data"
+
+# Scale: start with 1 instance, auto-scale on traffic
+[fly]
+  auto_stop_machines  = true
+  auto_start_machines = true
+  min_machines_running = 1

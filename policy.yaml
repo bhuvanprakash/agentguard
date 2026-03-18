@@ -1,0 +1,83 @@
+# AgentGuard Policy File — v1
+# Place this at the path set in AGENTGUARD_POLICY_FILE
+# Hot-reload: POST /reload-policy to apply changes
+# without restarting the server.
+
+version: "1"
+
+# What to do when no rule matches an agent+tool combination.
+# "block" is safe. "allow" is permissive.
+default: block
+
+agents:
+
+  # ── Specific agent policies ───────────────────────────────
+
+  - id: billing-agent
+    allow:
+      - tool: read_invoice
+      - tool: read_customer
+      - tool: create_draft_invoice
+    block:
+      - tool: delete_customer
+      - tool: delete_invoice
+      - tool: drop_table
+    escalate:
+      - tool: send_invoice       # needs human approval
+      - tool: send_payment       # always escalate (also in hardcoded list)
+    spend_limit_daily_usd: 0.003
+    irreversible_require_human: true
+
+  - id: smoke-test-agent
+    allow:
+      - tool: read_file
+      - tool: search
+    block:
+      - tool: delete_customer
+      - tool: drop_table
+    escalate:
+      - tool: send_payment
+      - tool: write_file
+
+  - id: code-agent
+    allow:
+      - tool: read_file
+      - tool: write_file
+      - tool: run_tests
+      - tool: search_codebase
+      - tool: git_status
+      - tool: git_diff
+    block:
+      - tool: delete_file        # use trash instead
+      - tool: execute_shell      # too dangerous
+    escalate:
+      - tool: git_push           # needs human approval
+
+  - id: researcher-agent
+    allow:
+      - tool: web_search
+      - tool: read_url
+      - tool: summarize
+    block:
+      - tool: "*"                # block everything else
+      # Note: "*" in block blocks everything not in allow
+
+  # ── Wildcard: applies to any agent not listed above ──────
+
+  - id: "*"
+    allow:
+      - tool: read_file
+      - tool: search
+      - tool: list
+      - tool: get
+    block:
+      - tool: delete
+      - tool: drop
+      - tool: truncate
+      - tool: execute_shell
+      - tool: send_payment
+    escalate:
+      - tool: write_file
+      - tool: create
+      - tool: update
+      - tool: post

@@ -1,0 +1,15 @@
+bin/
+*.env
+.env
+.env.local
+*.db
+*.sqlite
+*.sqlite3
+/tmp/
+audit_smoke.db
+node_modules/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+dist/
+build/

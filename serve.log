@@ -1,0 +1,11 @@
+AgentGuard v0.1.0 starting on port 7777
+  Upstream:   http://localhost:8080
+  Policy:     ./policy.yaml
+  SQLite:     ./audit.db
+  Supabase:   https://xxxx.supabase.co
+
+2026/03/18 05:03:06 [agentguard] Policy loaded from ./policy.yaml
+2026/03/18 05:03:06 [agentguard] Audit log: ./audit.db
+2026/03/18 05:03:06 [agentguard] Spend tracker initialized
+2026/03/18 05:03:06 [agentguard] Escalation store initialized
+2026/03/18 05:03:06 [agentguard] Listening on :7777 → upstream: http://localhost:8080

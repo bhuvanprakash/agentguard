@@ -1,0 +1,189 @@
+openapi: "3.1.0"
+
+info:
+  title:       AgentGuard API
+  description: Protocol-neutral AI agent enforcement proxy
+  version:     "1.0.0"
+  contact:
+    name:  Nascentist
+    url:   https://nascentist.ai
+    email: support@nascentist.ai
+  license:
+    name: MIT
+    url:  https://opensource.org/licenses/MIT
+
+servers:
+  - url:         http://localhost:7777
+    description: Local development
+  - url:         https://agentguard.nascentist.ai
+    description: Hosted cloud tier
+
+tags:
+  - name: health
+    description: Service health and status
+  - name: proxy
+    description: Agent request interception
+  - name: escalations
+    description: Human approval queue
+  - name: policy
+    description: Policy management
+
+paths:
+
+  /health:
+    get:
+      tags:    [health]
+      summary: Service health check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /reload-policy:
+    post:
+      tags:    [policy]
+      summary: Hot-reload policy file without restart
+      responses:
+        "200":
+          description: Policy reloaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "policy reloaded" }
+        "500":
+          description: Policy file parse error
+
+  /escalations:
+    get:
+      tags:    [escalations]
+      summary: List pending escalations
+      security:
+        - AdminKey: []
+      responses:
+        "200":
+          description: List of pending escalations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  escalations:
+                    type:  array
+                    items: { $ref: '#/components/schemas/Escalation' }
+                  count:
+                    type: integer
+
+  /escalations/{id}:
+    get:
+      tags:    [escalations]
+      summary: Get escalation by ID
+      parameters:
+        - name: id
+          in:   path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Escalation found
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Escalation' }
+        "404":
+          description: Escalation not found
+
+  /escalations/{id}/approve:
+    post:
+      tags:    [escalations]
+      summary: Approve a pending escalation
+      security:
+        - AdminKey: []
+      parameters:
+        - name: id
+          in:   path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Escalation approved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResolveResponse' }
+        "400":
+          description: Escalation not found or already resolved
+        "401":
+          description: Invalid admin key
+
+  /escalations/{id}/reject:
+    post:
+      tags:    [escalations]
+      summary: Reject a pending escalation
+      security:
+        - AdminKey: []
+      parameters:
+        - name: id
+          in:   path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Escalation rejected
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResolveResponse' }
+
+components:
+
+  securitySchemes:
+    AdminKey:
+      type: apiKey
+      in:   header
+      name: X-AgentGuard-Admin-Key
+
+  schemas:
+
+    HealthResponse:
+      type: object
+      properties:
+        status:       { type: string,  example: "ok" }
+        version:      { type: string,  example: "1.0.0" }
+        uptime_s:     { type: number,  example: 3600.5 }
+        environment:  { type: string,  example: "production" }
+        upstream:     { type: string,  example: "http://my-api:8080" }
+        policy_file:  { type: string,  example: "./policy.yaml" }
+        memory_mb:    { type: integer, example: 12 }
+        goroutines:   { type: integer, example: 8 }
+        ts:           { type: string,  format: date-time }
+
+    Escalation:
+      type: object
+      required: [id, agent_id, tool_name, protocol, status, ts, expires_at]
+      properties:
+        id:          { type: string }
+        agent_id:    { type: string, example: "billing-agent" }
+        tool_name:   { type: string, example: "send_payment" }
+        protocol:
+          type: string
+          enum: [mcp, a2a, atxp, unknown]
+        arguments:
+          type: object
+          additionalProperties: true
+        status:
+          type: string
+          enum: [pending, approved, rejected, expired]
+        ts:          { type: string, format: date-time }
+        expires_at:  { type: string, format: date-time }
+        age_minutes: { type: number }
+
+    ResolveResponse:
+      type: object
+      properties:
+        ok:        { type: boolean, example: true }
+        id:        { type: string }
+        status:    { type: string, enum: [approved, rejected] }
+        agent_id:  { type: string }
+        tool_name: { type: string }

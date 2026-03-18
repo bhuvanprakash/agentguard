@@ -1,0 +1,137 @@
+{
+  "info": {
+    "name": "AgentGuard API",
+    "description": "Protocol-neutral AI agent enforcement proxy",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Proxy",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Reload Policy",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/reload-policy",
+              "host": ["{{baseUrl}}"],
+              "path": ["reload-policy"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Escalations",
+      "item": [
+        {
+          "name": "List Pending Escalations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-AgentGuard-Admin-Key",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/escalations",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalations"]
+            }
+          }
+        },
+        {
+          "name": "Get Escalation by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-AgentGuard-Admin-Key",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/escalations/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalations", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "your-escalation-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Approve Escalation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-AgentGuard-Admin-Key",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/escalations/:id/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalations", ":id", "approve"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "your-escalation-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reject Escalation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-AgentGuard-Admin-Key",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/escalations/:id/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["escalations", ":id", "reject"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "your-escalation-id"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7777"
+    },
+    {
+      "key": "adminKey",
+      "value": "your-admin-key"
+    }
+  ]
+}
