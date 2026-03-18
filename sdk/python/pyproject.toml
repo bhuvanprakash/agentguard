@@ -7,7 +7,7 @@ name        = "agentguard"
 version     = "0.1.0"
 description = "Protocol-neutral AI agent enforcement proxy SDK"
 readme      = "README.md"
-license     = { text = "MIT" }
+license     = { text = "Apache-2.0" }
 requires-python = ">=3.9"
 
 keywords = [
@@ -18,7 +18,7 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -35,9 +35,9 @@ dev  = ["pytest>=8.0", "pyyaml>=6.0"]
 
 [project.urls]
 Homepage      = "https://nascentist.ai/docs/agentguard"
-Repository    = "https://github.com/nascentist/agentguard"
+Repository    = "https://github.com/bhuvanprakash/agentguard"
 Documentation = "https://nascentist.ai/docs/agentguard"
-Issues        = "https://github.com/nascentist/agentguard/issues"
+Issues        = "https://github.com/bhuvanprakash/agentguard/issues"
 
 [project.scripts]
 agentguard-validate = "agentguard.policy:_cli_validate"

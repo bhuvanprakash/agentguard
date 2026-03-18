@@ -1,7 +1,7 @@
 package main
 
 // AgentGuard — Protocol-neutral AI agent enforcement proxy.
-// Built for Nascentist by Bhuvan Prakash.
+// Built by Bhuvan Prakash for nascentist.com.
 //
 // Usage:
 //   AGENTGUARD_UPSTREAM_URL=http://localhost:8080 \
